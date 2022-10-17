@@ -30,11 +30,10 @@ function Get-OPBearerToken {
 
     process {
         if ( ($null -eq $Token) -or ($Token.CreationTime -gt $(Get-Date).AddHours(-24)) ) {
-            Write-Output 'API Token is expired or does not exist. Requesting new token.'
+            Write-Information 'API Token is expired or does not exist. Requesting new token.'
 
             $Credential = Get-Credential -Message 'Enter username/password for OpenProvider API authentication:'
             
-            # -AsPlainText parameter does not exist in PS5; Added custom function in catch block to fix this.
             try {
                 $Body = @{
                     username = $Credential.Username
@@ -42,6 +41,7 @@ function Get-OPBearerToken {
                 } | ConvertTo-Json
             }
             catch {
+                # AsPlainText param does not exist in PS5. Added custom function to fix.
                 $Body = @{
                     username = $Credential.Username
                     password = Convert-SecureToPlain -SecureString $Credential.Password
@@ -54,27 +54,26 @@ function Get-OPBearerToken {
                 Body        = $Body
                 ContentType = 'application/json'
             }
-        
-            $Request  = Invoke-RestMethod @Params -Verbose:$false
-            $Response = ($Request).data
-            
-            $Data = [PSCustomObject]@{
-                Token        = $Response.Token
-                CreationTime = (Get-Date)
-            }
-            
+                    
             try {
+                $Request  = Invoke-RestMethod @Params -Verbose:$false
+                $Response = ($Request).data
+                
+                $Data = [PSCustomObject]@{
+                    Token        = $Response.Token
+                    CreationTime = (Get-Date)
+                }
+                
                 Set-Variable -Name 'OPToken' -Value $Data -Option Private -Scope 'Global'
             }
             catch {
                 Write-Error $_
             }
-        } # end If
-    }
+        }
+    } # end Process
 
     end {
         $Token = Get-Variable -Name 'OPToken' -Scope 'Global' -ErrorAction SilentlyContinue
         return $Token.Value
     }
-
 }

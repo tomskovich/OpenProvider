@@ -8,6 +8,11 @@ function Sync-AzNsToOpenProvider {
         [String] $ResourceGroupName = 'DNS'
     )
 
+    begin {
+        # Use TLS 1.2 for older PowerShell versions
+        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+    }
+
     process {
         # Get Azure NameServers for domain
         $AzNsInfo = Get-AzDnsZone -Name $Domain -ResourceGroupName $ResourceGroupName | Select-Object -ExpandProperty NameServers -First 1

@@ -134,7 +134,7 @@ function Sync-OPDnsToAzure {
 
             # Start synchronizing DNS records from OpenProvider to Azure
             Write-Output "STARTED : Syncing DNS zone of $Domain from OP to Azure."
-            
+
             # A-Records
             Write-Information 'Processing A-Records...'
             $ARecords = $OPDnsZone | Where-Object 'RecordType' -eq 'A'
