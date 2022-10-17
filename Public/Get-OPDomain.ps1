@@ -72,8 +72,13 @@ function Get-OPDomain {
             ContentType = 'application/json'
         }
 
-        $Request  = Invoke-RestMethod @Params -Verbose:$false
-        $Response = ($Request).data.results 
+        try {
+            $Request  = Invoke-RestMethod @Params -Verbose:$false
+            $Response = ($Request).data.results 
+        }
+        catch {
+            Write-Error $_
+        }
 
         if ($Response) {
             $Result = foreach ($item in $Response) {
