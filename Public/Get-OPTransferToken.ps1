@@ -32,22 +32,21 @@ function Get-OPTransferToken {
         # API URL
         [Parameter()]
         [Alias('URI')]
-        [String] $URL = 'https://api.openprovider.eu/v1beta/domains',
-
-        # Token for OpenProvider API Authorization - Requires Get-OPBearerToken function.
-        [Parameter()]
-        [String] $Token = (Get-OPBearerToken).token
+        [String] $URL = 'https://api.openprovider.eu/v1beta/domains'
     )
 
     begin {
         # Use TLS 1.2 for older PowerShell versions
         [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+        # Token for OpenProvider API Authorization - Requires Get-OPBearerToken function.
+        [String] $Token = (Get-OPBearerToken).token
     }
 
     process {
         try {
-            # Remove domain extensions (required)
-            $Domains = ($Domains) -replace '\..*$', ''
+            # Format domain name so "www" AND extension is removed. Also verifies if domain is valid.
+            $Domains = Format-DomainName -Domain $Domains -RemoveExtension
 
             $Data = foreach ($Domain in $Domains) {
                 $Body = @{
@@ -89,5 +88,4 @@ function Get-OPTransferToken {
             Write-Error $_
         }
     } # end process
-
 }

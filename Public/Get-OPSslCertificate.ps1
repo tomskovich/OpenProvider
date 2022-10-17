@@ -30,16 +30,15 @@ function Get-OPSslCertificate {
         # API URL
         [Parameter()]
         [Alias('URI')]
-        [String] $URL = 'https://api.openprovider.eu/v1beta/ssl/orders',
-
-        # Token for OpenProvider API Authorization - Requires Get-OPBearerToken function.
-        [Parameter()]
-        [String] $Token = (Get-OPBearerToken).token
+        [String] $URL = 'https://api.openprovider.eu/v1beta/ssl/orders'
     )
 
     begin {
         # Use TLS 1.2 for older PowerShell versions
         [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+        # Token for OpenProvider API Authorization - Requires Get-OPBearerToken function.
+        [String] $Token = (Get-OPBearerToken).token
     }
 
     process {
@@ -93,6 +92,5 @@ function Get-OPSslCertificate {
             Write-Error $_
         }
     } # end process
-
 }
 
